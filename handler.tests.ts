@@ -1,19 +1,26 @@
-import * as AWS from 'aws-sdk';
+import * as t_AWS from 'aws-sdk';
+import * as t_https from 'https';
+import * as t_mysql from 'mysql2/promise';
 import { handler } from './handler';
 import {expect, jest, test} from '@jest/globals';
-
+import { strictEqual } from 'assert';
 
 jest.mock('aws-sdk');
 jest.mock('https');
 jest.mock('mysql2/promise');
 
 describe('handler', () => {
-    const sqs = new AWS.SQS() as jest.Mocked<typeof AWS.SQS>;
-    const https = require('https') as jest.Mocked<typeof https>;
-    const mysql = require('mysql2/promise') as jest.Mocked<typeof mysql>;
+    const AWS = require('aws-sdk') as any as jest.Mocked<typeof t_AWS>;
+    const https = require('https') as any as jest.Mocked<typeof t_https>;
+    const mysql = require('mysql2/promise') as any as jest.Mocked<typeof t_mysql>;
+
+    let sqs = new AWS.SQS() as any as jest.Mocked<typeof t_AWS.SQS>;
 
     beforeEach(() => {
-        sqs.deleteMessage.mockReturnValue({ promise: jest.fn().mockResolvedValue(null) });
+        sqs.deleteMessage
+            .mockReturnValue({
+                promise: jest.fn().mockResolvedValue(null)
+            });
         mysql.createConnection.mockReturnValue({
             execute: jest.fn().mockResolvedValue(null),
             close: jest.fn(),
